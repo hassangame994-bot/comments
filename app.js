@@ -413,4 +413,7 @@ app.post('/',async(req,res)=>{
     const all_description = await description.find()
     res.redirect('/')
 })
-app.listen(3000)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
