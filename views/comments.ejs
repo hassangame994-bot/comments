@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صندوق الاقتراحات</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* إعدادات المتصفح العامة */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: #f7f5f0; /* خلفية بيج هادئة ومريحة للعين */
+            color: #333;
+            display: flex;
+            flex-direction: column; /* ترتيب العناصر عمودياً */
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+            gap: 30px; /* مسافة بين صندوق الإرسال وصندوق العرض */
+        }
+
+        /* حاوية الصندوق الرئيسية */
+        .suggestions-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border-top: 6px solid #1c493a; /* إطار علوي باللون الأخضر الإسلامي */
+            position: relative;
+        }
+
+        /* زخرفة علوية بسيطة محاكاة للتصميم الديني */
+        .suggestions-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #c5a059, transparent); /* خط ذهبي متدرج */
+        }
+
+        /* رأس الصفحة */
+        .form-header {
+            text-align: center;
+            padding: 40px 20px 20px 20px;
+            background: linear-gradient(to bottom, #fcfbfa, #ffffff);
+        }
+
+        .form-header h1 {
+            color: #1c493a; /* الأخضر الداكن */
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #777;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        /* زينة فاصلة */
+        .divider {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .divider span {
+            display: block;
+            width: 50px;
+            height: 1px;
+            background-color: #e0dcd3;
+        }
+
+        .divider i {
+            color: #c5a059; /* لون ذهبي للمركز */
+            margin: 0 10px;
+            font-size: 12px;
+        }
+
+        /* محتوى النموذج */
+        .form-content {
+            padding: 20px 40px 40px 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1c493a;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        /* تصميم خانات الإدخال */
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1.5px solid #e0dcd3;
+            border-radius: 8px;
+            background-color: #faf9f6;
+            font-size: 15px;
+            color: #444;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        /* تأثير عند الضغط على الخانة */
+        .form-control:focus {
+            border-color: #c5a059; /* يتحول الإطار للذهبي */
+            background-color: #ffffff;
+            box-shadow: 0 0 8px rgba(197, 160, 89, 0.2);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        /* زر الإرسال */
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #1c493a; /* الخلفية الخضراء */
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(28, 73, 58, 0.15);
+        }
+
+        .submit-btn:hover {
+            background-color: #14352a;
+            box-shadow: 0 6px 15px rgba(28, 73, 58, 0.25);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* ========================================= */
+        /* تصميم قسم التعليقات الجديد والاحترافي */
+        /* ========================================= */
+        .comments-section {
+            width: 100%;
+            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            border-right: 4px solid #c5a059; /* لمسة ذهبية جانبية تعطي فخامة */
+        }
+
+        .comments-section h2 {
+            color: #1c493a;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comment-card {
+            background-color: #faf9f6;
+            border: 1px solid #e0dcd3;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .comment-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .comment-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            border-color: #c5a059;
+        }
+
+        .comment-user {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .user-name {
+            color: #1c493a;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .anonymous-tag {
+            font-size: 11px;
+            background-color: #e0dcd3;
+            color: #666;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .comment-text {
+            color: #444;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-line; /* للحفاظ على الأسطر الجديدة إذا كتبت في الـ textarea */
+        }
+
+        /* متجاوب مع الشاشات الصغيرة */
+        @media (max-width: 480px) {
+            .form-content, .comments-section {
+                padding: 20px;
+            }
+            .form-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="suggestions-container">
+        <div class="form-header">
+            <h1>صندوق الاقتراحات</h1>
+            <div class="divider">
+                <span></span>
+                <i>◆</i>
+                <span></span>
+            </div>
+            <p>يسعدنا استقبال آرائكم ومقترحاتكم لتطوير محتوى الموقع وخدمته. شاركونا أفكاركم وسنكون ممتنين لكل طرحٍ بنّاء.</p>
+        </div>
+
+        <form class="form-content" action="/" method="POST">
+            <div class="form-group">
+                <label for="username">الاسم الكريم (اختياري)</label>
+                <input type="text" id="username" name="name" class="form-control" placeholder="أدخل اسمك هنا..."required>
+            </div>
+
+            <div class="form-group">
+                <label for="user-comment">التعليق أو المقترح</label>
+                <textarea id="user-comment" name="comment" class="form-control" placeholder="اكتب مقترحك أو استفسارك هنا بكل وضوح..." required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">إرسال المقترح</button>
+        </form>
+    </div>
+
+    <% if (typeof descriptions !== 'undefined' && descriptions.length > 0) { %>
+        <div class="comments-section">
+            <h2>المقترحات والآراء الواردة</h2>
+            
+            <% for(let i of descriptions) { %>
+                <div class="comment-card">
+                    <div class="comment-user">
+                        <span class="user-name"><%= i.id && i.name.trim() !== "" ? i.name : "مشارك مجهول" %></span>
+                        <% if(!i.name || i.name.trim() === "") { %>
+                            <span class="anonymous-tag">فاعل خير</span>
+                        <% } %>
+                    </div>
+                    <p class="comment-text"><%= i.description %></p>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+
+</body>
+</html>
