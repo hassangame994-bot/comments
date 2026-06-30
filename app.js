@@ -392,7 +392,7 @@ const mongoose = require("mongoose"); // استيراد مكتبة Mongoose لل
 const description = require("./lesson 5/article"); // استيراد الموديل (النموذج الهيكلي) الخاص بالمقالة لإجراء العمليات عليها
 const path = require("path"); // استيراد مكتبة Path المدمجة للتعامل مع مسارات الملفات والمجلدات
 
-
+app.set('views', path.join(__dirname, 'views')); // السطر الجديد
 app.set("view engine", "ejs");
 // برمجية وسيطة (Middleware) لتمكين السيرفر من قراءة وفك تشفير البيانات القادمة من نماذج HTML (Form Data)
 app.use(express.urlencoded({extended:true}));
