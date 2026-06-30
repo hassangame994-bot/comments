@@ -386,52 +386,68 @@
 // // تشغيل السيرفر
 // app.listen(3000)
 //--------------------------------------------------------------------------------------------------------
-const express = require("express"); // استيراد مكتبة Express لإنشاء خادم الويب (السيرفر)
-const app = express(); // تهيئة تطبيق Express وحفظه في المتغير app للتحكم بالسيرفر
-const mongoose = require("mongoose"); // استيراد مكتبة Mongoose للاتصال والتعامل مع قاعدة بيانات MongoDB
-const description = require("./lesson 5/article"); // استيراد الموديل (النموذج الهيكلي) الخاص بالمقالة لإجراء العمليات عليها
-const path = require("path"); // استيراد مكتبة Path المدمجة للتعامل مع مسارات الملفات والمجلدات
+const express = require("express"); // استيراد مكتبة Express لإنشاء خادم الويب
+const app = express(); // تهيئة تطبيق Express
+const mongoose = require("mongoose"); // استيراد مكتبة Mongoose للتعامل مع MongoDB
+const description = require("./lesson 5/article"); // استيراد الموديل الخاص بالمقالة
+const path = require("path"); // استيراد مكتبة Path للتعامل مع المسارات
 
-app.set('views', path.join(__dirname, 'views')); // السطر الجديد
+// ✅ 1. حل مشكلة الـ Views على Vercel (تحديد المسار المطلق)
+app.set('views', path.join(__dirname, 'views'));
 app.set("view engine", "ejs");
-// برمجية وسيطة (Middleware) لتمكين السيرفر من قراءة وفك تشفير البيانات القادمة من نماذج HTML (Form Data)
+
+// برمجية وسيطة لتمكين السيرفر من قراءة البيانات القادمة من الفورم
 app.use(express.urlencoded({extended:true}));
-// دالة ذكية للاتصال بقاعدة البيانات والتأكد من حالتها في بيئة Serverless
+
+// ✅ 2. حل مشكلة الـ Buffering Timeout في بيئة Serverless
 async function connectDB() {
-    // إذا كانت قاعدة البيانات متصلة بالفعل، لا تفعل شيء واخرج
+    // إذا كانت قاعدة البيانات متصلة بالفعل، اخرج ولا تفتح اتصال جديد
     if (mongoose.connection.readyState === 1) {
         return;
     }
     console.log("Connecting to MongoDB...");
-    // ضع رابط الـ Connection String الخاص بك هنا كاملاً
     await mongoose.connect("mongodb://rgl0ogno8m_db_user:k1lG1V4lDZOiUzqg@ac-f3s2kej-shard-00-00.xzwb3vq.mongodb.net:27017,ac-f3s2kej-shard-00-01.xzwb3vq.mongodb.net:27017,ac-f3s2kej-shard-00-02.xzwb3vq.mongodb.net:27017/?ssl=true&authSource=admin");
     console.log("Connected to MongoDB successfully!");
 }
 
-// Middleware يضمن عدم تشغيل أي صفحة أو مسار قبل تمام الاتصال
+// Middleware يضمن تمام الاتصال بقاعدة البيانات قبل تنفيذ أي طلب
 app.use(async (req, res, next) => {
     try {
         await connectDB();
-        next(); // اسمح للطلب بالمرور وعرض الصفحة
+        next(); // اسمح للطلب بالمرور
     } catch (err) {
         console.error("MongoDB Connection Error:", err);
         res.status(500).send("Database Connection Error");
     }
 });
-app.get('/',async(req,res)=>{
-    const all_description = await description.find()
-    res.render("comments.ejs",{
-        descriptions:all_description
-    })
-})
-app.post('/',async(req,res)=>{
-    const desc = new description();
-    desc.name = req.body.name
-    desc.description = req.body.comment
-    await desc.save()
-    const all_description = await description.find()
-    res.redirect('/')
-})
+
+// مسار عرض التعليقات
+app.get('/', async(req, res) => {
+    try {
+        const all_description = await description.find();
+        res.render("comments.ejs", {
+            descriptions: all_description
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading comments");
+    }
+});
+
+// مسار إضافة تعليق جديد (تم حذف السطر الزائد لتحسين الأداء)
+app.post('/', async(req, res) => {
+    try {
+        const desc = new description();
+        desc.name = req.body.name;
+        desc.description = req.body.comment;
+        await desc.save();
+        res.redirect('/');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error saving comment");
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
