@@ -396,9 +396,28 @@ app.set('views', path.join(__dirname, 'views')); // السطر الجديد
 app.set("view engine", "ejs");
 // برمجية وسيطة (Middleware) لتمكين السيرفر من قراءة وفك تشفير البيانات القادمة من نماذج HTML (Form Data)
 app.use(express.urlencoded({extended:true}));
-mongoose.connect("mongodb://rgl0ogno8m_db_user:kllG1V4lDZOiUzqg@ac-f3s2kej-shard-00-00.xzwb3vq.mongodb.net:27017,ac-f3s2kej-shard-00-01.xzwb3vq.mongodb.net:27017,ac-f3s2kej-shard-00-02.xzwb3vq.mongodb.net:27017/youssef?ssl=true&replicaSet=atlas-1468q9-shard-0&authSource=admin&appName=Cluster0")
-.then(()=>{console.log("connected")})
-.catch((e)=>{e});
+// دالة ذكية للاتصال بقاعدة البيانات والتأكد من حالتها في بيئة Serverless
+async function connectDB() {
+    // إذا كانت قاعدة البيانات متصلة بالفعل، لا تفعل شيء واخرج
+    if (mongoose.connection.readyState === 1) {
+        return;
+    }
+    console.log("Connecting to MongoDB...");
+    // ضع رابط الـ Connection String الخاص بك هنا كاملاً
+    await mongoose.connect("mongodb://rgl0ogno8m_db_user:k1lG1V4lDZOiUzqg@ac-f3s2kej-shard-00-00.xzwb3vq.mongodb.net:27017,ac-f3s2kej-shard-00-01.xzwb3vq.mongodb.net:27017,ac-f3s2kej-shard-00-02.xzwb3vq.mongodb.net:27017/?ssl=true&authSource=admin");
+    console.log("Connected to MongoDB successfully!");
+}
+
+// Middleware يضمن عدم تشغيل أي صفحة أو مسار قبل تمام الاتصال
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next(); // اسمح للطلب بالمرور وعرض الصفحة
+    } catch (err) {
+        console.error("MongoDB Connection Error:", err);
+        res.status(500).send("Database Connection Error");
+    }
+});
 app.get('/',async(req,res)=>{
     const all_description = await description.find()
     res.render("comments.ejs",{
